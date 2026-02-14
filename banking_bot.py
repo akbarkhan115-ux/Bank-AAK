@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from mistralai import Mistral
+import requests
+import json
 
 # Set page configuration
 st.set_page_config(
@@ -10,9 +11,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize Mistral client
+# Initialize Mistral API details
 api_key = "i6gploMEoAqIM5Qu4zRYIkqwKcSrHFhY"
-client = Mistral(api_key=api_key)
+api_base_url = "https://api.mistral.ai/v1"
 
 # Load FAQ data
 @st.cache_resource
@@ -71,22 +72,43 @@ Always be professional, friendly, and helpful."""
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         
-        # Prepare messages for API
-        messages = [{"role": "system", "content": system_prompt}]
-        for msg in st.session_state.messages[:-1]:
-            messages.append({"role": msg["role"], "content": msg["content"]})
-        
-        # Get response from Mistral AI
-        with message_placeholder.container():
-            response = client.chat.complete(
-                model="mistral-large-latest",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=1024
+        try:
+            # Prepare headers and request body
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            # Build messages list
+            messages = [{"role": "system", "content": system_prompt}]
+            for msg in st.session_state.messages[:-1]:
+                messages.append({"role": msg["role"], "content": msg["content"]})
+            
+            # Make API request
+            response = requests.post(
+                f"{api_base_url}/chat/completions",
+                headers=headers,
+                json={
+                    "model": "mistral-large-latest",
+                    "messages": messages,
+                    "temperature": 0.7,
+                    "max_tokens": 1024
+                }
             )
             
-            full_response = response.choices[0].message.content
-            message_placeholder.markdown(full_response)
+            if response.status_code == 200:
+                result = response.json()
+                full_response = result["choices"][0]["message"]["content"]
+                message_placeholder.markdown(full_response)
+            else:
+                error_msg = f"API Error: {response.status_code} - {response.text}"
+                message_placeholder.error(error_msg)
+                full_response = error_msg
+        
+        except Exception as e:
+            error_msg = f"Error: {str(e)}"
+            message_placeholder.error(error_msg)
+            full_response = error_msg
     
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": full_response})
