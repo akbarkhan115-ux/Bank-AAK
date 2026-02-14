@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 # Set page configuration
 st.set_page_config(
