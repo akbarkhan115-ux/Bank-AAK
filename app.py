@@ -100,33 +100,3 @@ with st.sidebar:
     if st.button("Clear Chat"):
         st.session_state.messages = []
         st.rerun()
-
-# Sidebar with information
-with st.sidebar:
-    st.markdown("### 📋 About HBDB")
-    st.markdown("HBDB is a global banking institution offering:")
-    st.markdown("""
-    - 💰 Savings and Checking Accounts
-    - 💳 Credit Cards
-    - 🏠 Mortgages
-    - 🚗 Auto Loans
-    - 📱 Mobile Banking
-    - 🌍 Global Transfers
-    - 💼 Business Accounts
-    """)
-    
-    st.markdown("---")
-    st.markdown("### ⚙️ How to Use")
-    st.markdown("""
-    1. Type your banking question in the chat box
-    2. The bot will respond with relevant information
-    3. For complex issues, contact HBDB customer service
-    """)
-    
-    st.markdown("---")
-    st.markdown("### 📞 Contact HBDB")
-    st.markdown("""
-    - Visit: www.hbdb.com
-    - Call: Check website for country-specific numbers
-    - Email: Check website for support
-    """)
