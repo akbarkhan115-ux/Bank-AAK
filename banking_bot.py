@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from mistralai import Mistral
+from mistralai.client import MistralClient
+from mistralai.models.chat_message import ChatMessage
 
 # Set page configuration
 st.set_page_config(
@@ -12,7 +13,7 @@ st.set_page_config(
 
 # Initialize Mistral client
 api_key = "i6gploMEoAqIM5Qu4zRYIkqwKcSrHFhY"
-client = Mistral(api_key=api_key)
+client = MistralClient(api_key=api_key)
 
 # Load FAQ data
 @st.cache_resource
@@ -72,13 +73,13 @@ Always be professional, friendly, and helpful."""
         message_placeholder = st.empty()
         
         # Prepare messages for API
-        messages = [{"role": "system", "content": system_prompt}]
+        messages = [ChatMessage(role="system", content=system_prompt)]
         for msg in st.session_state.messages[:-1]:
-            messages.append({"role": msg["role"], "content": msg["content"]})
+            messages.append(ChatMessage(role=msg["role"], content=msg["content"]))
         
-        # Get response from Mistral (non-streaming for stability)
+        # Get response from Mistral AI
         with message_placeholder.container():
-            response = client.chat.complete(
+            response = client.chat(
                 model="mistral-large-latest",
                 messages=messages,
                 temperature=0.7,
